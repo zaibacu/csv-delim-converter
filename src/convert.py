@@ -17,10 +17,10 @@ def main(args):
         logging.basicConfig(level=logging.DEBUG)
     else:
         logging.basicConfig(level=logging.INFO)
-    f_in = open(args.input, "r")
-    f_out = open(args.output if args.output else args.input, "w")
 
-    reader = csv.reader(f_in, delimiter=args.d1)
+    f_in = open(args.input, "r")
+    f_out = open(args.output, "w")
+    reader = csv.DictReader(f_in, delimiter=args.d1)
 
     q_level = csv.QUOTE_MINIMAL
     if args.quote_level == QuoteLevel.Null:
@@ -30,9 +30,7 @@ def main(args):
     elif args.quote_level == QuoteLevel.All:
         q_level = csv.QUOTE_ALL
 
-    header = next(reader)
-    print(header)
-    writer = csv.DictWriter(f_out, delimiter=args.d2, quotechar=args.quote, quoting=q_level, fieldnames=header)
+    writer = csv.DictWriter(f_out, delimiter=args.d2, quotechar=args.quote, quoting=q_level, fieldnames=reader.fieldnames)
     writer.writeheader()
     for row in reader:
         writer.writerow(row)
@@ -44,7 +42,7 @@ def main(args):
 if __name__ == "__main__":
     parser = ArgumentParser()
     parser.add_argument("input", help="Input file")
-    parser.add_argument("--output", help="Output file", default=None)
+    parser.add_argument("--output", help="Output file")
     parser.add_argument("-d1", help="Initial delimiter")
     parser.add_argument("-d2", help="Final delimiter")
     parser.add_argument("--quote", help="Quote character", default="\"")
